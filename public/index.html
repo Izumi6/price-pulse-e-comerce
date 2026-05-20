@@ -658,8 +658,8 @@ function doSearch() {
   setTimeout(() => {
     const matched = products.filter(p =>
       p.name.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q) ||
-      p.keywords.some(k => k.includes(q) || q.includes(k))
+      (p.category && p.category.toLowerCase().includes(q)) ||
+      (p.keywords && p.keywords.some(k => k.includes(q) || q.includes(k)))
     );
     renderResults(q, matched);
   }, 500);
@@ -714,7 +714,7 @@ function buildProductHTML(products) {
           <h2>${p.name}</h2>
           <div class="tag-list">
             <span class="ptag">${p.category.toUpperCase()}</span>
-            ${p.tags.map(t => `<span class="ptag">${t}</span>`).join('')}
+            ${(p.tags||[]).map(t => `<span class="ptag">${t}</span>`).join('')}
           </div>
         </div>
       </div>
