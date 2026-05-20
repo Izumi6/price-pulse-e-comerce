@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PriceRadar — Electronics Price Comparison India</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c27;
+    --border: #2a2a3a;
+    --accent: #00e5ff;
+    --accent2: #ff3c6e;
+    --green: #00ff88;
+    --text: #e8e8f0;
+    --muted: #6b6b88;
+    --card-glow: rgba(0, 229, 255, 0.06);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Space Mono', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .logo-text {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  .logo-text span { color: var(--accent); }
+
+  .nav-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 80px 2rem 60px;
+    text-align: center;
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.2);
+    color: var(--accent);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+    letter-spacing: 0.08em;
+  }
+
+  .hero-badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  h1 {
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+    margin-bottom: 16px;
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 500px;
+    margin: 0 auto 40px;
+  }
+
+  .search-wrap {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 6px 6px 6px 20px;
+    gap: 10px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .search-box:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,229,255,0.12);
+  }
+
+  .search-icon {
+    color: var(--muted);
+    flex-shrink: 0;
+    font-size: 1.1rem;
+  }
+
+  #searchInput {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  #searchInput::placeholder { color: var(--muted); font-weight: 400; }
+
+  .search-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    white-space: nowrap;
+  }
+
+  .search-btn:hover { background: #33eaff; }
+  .search-btn:active { transform: scale(0.97); }
+
+  .quick-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .quick-tag {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 14px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .quick-tag:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,229,255,0.06);
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem 80px;
+  }
+
+  .loader {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 60px 0;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+
+  .loader.active { display: flex; }
+
+  .spinner {
+    width: 44px; height: 44px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .results-header {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .results-header.active { display: flex; }
+
+  .results-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .results-title span { color: var(--text); }
+
+  .sort-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sort-label {
+    font-size: 0.78rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .sort-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .sort-btn:hover, .sort-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,229,255,0.06);
+  }
+
+  .product-block {
+    margin-bottom: 40px;
+  }
+
+  .product-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .product-thumb {
+    width: 60px; height: 60px;
+    border-radius: 12px;
+    object-fit: contain;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 6px;
+    flex-shrink: 0;
+  }
+
+  .product-info h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+  }
+
+  .product-info .tag-list {
+    display: flex; gap: 6px; flex-wrap: wrap;
+  }
+
+  .ptag {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .price-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+  }
+
+  .price-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .price-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--card-glow);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  .price-card:hover {
+    border-color: rgba(0,229,255,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+  }
+
+  .price-card:hover::before { opacity: 1; }
+
+  .price-card.lowest {
+    border-color: var(--green);
+    background: linear-gradient(135deg, rgba(0,255,136,0.06), var(--surface));
+  }
+
+  .best-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--green);
+    color: #000;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 100px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .store-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .store-logo {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .store-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .store-rating {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+  }
+
+  .price-row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .price-main {
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: -0.03em;
+  }
+
+  .lowest .price-main { color: var(--green); }
+
+  .price-orig {
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: line-through;
+    font-family: 'Space Mono', monospace;
+  }
+
+  .price-disc {
+    font-size: 0.7rem;
+    color: var(--accent2);
+    font-weight: 700;
+    background: rgba(255,60,110,0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .delivery-info {
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .buy-btn {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .price-card:not(.lowest) .buy-btn {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .price-card:not(.lowest) .buy-btn:hover {
+    background: var(--border);
+  }
+
+  .lowest .buy-btn {
+    background: var(--green);
+    color: #000;
+  }
+
+  .lowest .buy-btn:hover {
+    background: #33ffaa;
+    transform: scale(1.02);
+  }
+
+  .empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 80px 20px;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .empty.active { display: flex; }
+  .empty .e-icon { font-size: 3rem; opacity: 0.4; }
+  .empty h3 { color: var(--text); font-size: 1.1rem; }
+  .empty p { font-size: 0.88rem; max-width: 300px; line-height: 1.6; }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 32px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-family: 'Space Mono', monospace;
+  }
+
+  @media (max-width: 640px) {
+    nav { padding: 0 1rem; }
+    .hero { padding: 50px 1rem 40px; }
+    .price-grid { grid-template-columns: 1fr 1fr; }
+    .product-meta { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (max-width: 400px) {
+    .price-grid { grid-template-columns: 1fr; }
+  }
+
+  .price-card {
+    animation: fadeUp 0.35s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .price-grid .price-card:nth-child(1) { animation-delay: 0.04s; }
+  .price-grid .price-card:nth-child(2) { animation-delay: 0.08s; }
+  .price-grid .price-card:nth-child(3) { animation-delay: 0.12s; }
+  .price-grid .price-card:nth-child(4) { animation-delay: 0.16s; }
+  .price-grid .price-card:nth-child(5) { animation-delay: 0.2s; }
+
+  #results { min-height: 200px; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 32px 0;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-icon">⚡</div>
+    <span class="logo-text">Price<em>Radar</em></span>
+  </a>
+  <span class="nav-tag">INDIA · ELECTRONICS</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">LIVE PRICE COMPARISON</div>
+  <h1>Stop overpaying for <em>electronics</em></h1>
+  <p class="hero-sub">Compare prices from Amazon, Flipkart, Croma, Reliance Digital & more — instantly.</p>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input id="searchInput" type="text" placeholder="Search iPhone 15, Samsung TV, MacBook…" autocomplete="off">
+      <button class="search-btn" onclick="doSearch()">Compare Prices</button>
+    </div>
+    <div class="quick-tags">
+      <span class="quick-tag" onclick="quickSearch('iPhone 15')">iPhone 15</span>
+      <span class="quick-tag" onclick="quickSearch('Samsung Galaxy S24')">Samsung S24</span>
+      <span class="quick-tag" onclick="quickSearch('MacBook Air M2')">MacBook Air M2</span>
+      <span class="quick-tag" onclick="quickSearch('Sony 4K TV')">Sony 4K TV</span>
+      <span class="quick-tag" onclick="quickSearch('headphone')">Headphones</span>
+      <span class="quick-tag" onclick="quickSearch('smartwatch')">Smartwatch</span>
+      <span class="quick-tag" onclick="quickSearch('tablet')">Tablets</span>
+      <span class="quick-tag" onclick="quickSearch('washing machine')">Washing Machine</span>
+      <span class="quick-tag" onclick="quickSearch('cooler')">Air Cooler</span>
+      <span class="quick-tag" onclick="quickSearch('earbuds')">Earbuds</span>
+      <span class="quick-tag" onclick="quickSearch('refrigerator')">Refrigerator</span>
+      <span class="quick-tag" onclick="quickSearch('ps5')">PS5</span>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+    <span>Scanning prices across stores…</span>
+  </div>
+
+  <div class="results-header" id="resultsHeader">
+    <div class="results-title">Showing results for: <span id="queryLabel"></span></div>
+    <div class="sort-group">
+      <span class="sort-label">Sort:</span>
+      <button class="sort-btn active" id="sortLow" onclick="sortResults('asc')">Lowest Price</button>
+      <button class="sort-btn" id="sortHigh" onclick="sortResults('desc')">Highest Price</button>
+    </div>
+  </div>
+
+  <div id="results"></div>
+
+  <div class="empty" id="empty">
+    <div class="e-icon">🔎</div>
+    <h3>No results found</h3>
+    <p>Try searching for iPhone, Samsung, MacBook, Sony TV, or any popular gadget.</p>
+  </div>
+</main>
+
+<footer>
+  PriceRadar © 2025 — Prices are indicative. Always verify on the retailer's site before purchase.
+</footer>
+
+<script>
+let products = [];
+let currentResults = [];
+let sortOrder = 'asc';
+
+// Load all products from Supabase on page load
+fetch('/api/products').then(r=>r.json()).then(d=>{products=d;}).catch(e=>console.log(e));
+
+function doSearch() {
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  if (!q) return;
+  showLoader();
+  fetch('/api/search?q=' + encodeURIComponent(q))
+    .then(r => r.json())
+    .then(data => { currentResults = data; renderResults(q, data); })
+    .catch(() => renderResults(q, []));
+}
+
+function quickSearch(term) {
+  document.getElementById('searchInput').value = term;
+  doSearch();
+}
+
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doSearch();
+});
+
+function showLoader() {
+  document.getElementById('loader').classList.add('active');
+  document.getElementById('resultsHeader').classList.remove('active');
+  document.getElementById('results').innerHTML = '';
+  document.getElementById('empty').classList.remove('active');
+}
+
+function renderResults(q, matched) {
+  document.getElementById('loader').classList.remove('active');
+  if (!matched || matched.length === 0) {
+    document.getElementById('empty').classList.add('active');
+    return;
+  }
+  currentResults = matched;
+  document.getElementById('queryLabel').textContent = `"${q}"`;
+  document.getElementById('resultsHeader').classList.add('active');
+  document.getElementById('sortLow').classList.add('active');
+  document.getElementById('sortHigh').classList.remove('active');
+  sortOrder = 'asc';
+  buildProductHTML(matched);
+}
+
+function buildProductHTML(products) {
+  const container = document.getElementById('results');
+  container.innerHTML = '';
+  products.forEach((p, pi) => {
+    const stores = sortOrder === 'asc'
+      ? [...p.stores].sort((a, b) => a.price - b.price)
+      : [...p.stores].sort((a, b) => b.price - a.price);
+    const lowestPrice = Math.min(...p.stores.map(s => s.price));
+    const block = document.createElement('div');
+    block.className = 'product-block';
+    block.innerHTML = `
+      ${pi > 0 ? '<hr class="divider">' : ''}
+      <div class="product-meta">
+        <img class="product-thumb" src="${p.image}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/60x60/1c1c27/6b6b88?text=📱'">
+        <div class="product-info">
+          <h2>${p.name}</h2>
+          <div class="tag-list">
+            <span class="ptag">${p.category.toUpperCase()}</span>
+            ${p.tags.map(t => `<span class="ptag">${t}</span>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="price-grid">
+        ${stores.map(s => {
+          const isLowest = s.price === lowestPrice;
+          const disc = Math.round((1 - s.price / s.orig) * 100);
+          return `
+          <div class="price-card ${isLowest ? 'lowest' : ''}">
+            ${isLowest ? '<div class="best-badge">✦ Best Price</div>' : ''}
+            <div class="store-row">
+              <div class="store-logo">${s.icon}</div>
+              <div>
+                <div class="store-name">${s.name}</div>
+                <div class="store-rating">★ 4.${Math.floor(Math.random()*3)+5}/5</div>
+              </div>
+            </div>
+            <div>
+              <div class="price-row">
+                <span class="price-main">₹${s.price.toLocaleString('en-IN')}</span>
+                ${disc > 0 ? `<span class="price-disc">-${disc}%</span>` : ''}
+              </div>
+              ${disc > 0 ? `<div class="price-orig">₹${s.orig.toLocaleString('en-IN')}</div>` : ''}
+            </div>
+            <div class="delivery-info">📦 ${s.delivery}</div>
+            <a class="buy-btn" href="${s.url}" target="_blank" rel="noopener">
+              ${isLowest ? '🛒 Buy Now — Best Deal' : 'Buy on ' + s.name}
+            </a>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+    container.appendChild(block);
+  });
+}
+
+function sortResults(order) {
+  sortOrder = order;
+  document.getElementById('sortLow').classList.toggle('active', order === 'asc');
+  document.getElementById('sortHigh').classList.toggle('active', order === 'desc');
+  if (currentResults.length) buildProductHTML(currentResults);
+}
+</script>
+</body>
+</html>
