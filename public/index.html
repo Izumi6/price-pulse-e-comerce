@@ -647,17 +647,22 @@ let products = [];
 let currentResults = [];
 let sortOrder = 'asc';
 
-// Load all products from Supabase on page load
-fetch('/api/products').then(r=>r.json()).then(d=>{products=d;}).catch(e=>console.log(e));
+// Load all products from Supabase-exported data.json
+fetch('/data.json').then(r=>r.json()).then(d=>{products=d;}).catch(e=>console.log(e));
 
 function doSearch() {
   const q = document.getElementById('searchInput').value.trim().toLowerCase();
   if (!q) return;
   showLoader();
-  fetch('/api/search?q=' + encodeURIComponent(q))
-    .then(r => r.json())
-    .then(data => { currentResults = data; renderResults(q, data); })
-    .catch(() => renderResults(q, []));
+  // Client-side search against Supabase data
+  setTimeout(() => {
+    const matched = products.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.category.toLowerCase().includes(q) ||
+      p.keywords.some(k => k.includes(q) || q.includes(k))
+    );
+    renderResults(q, matched);
+  }, 500);
 }
 
 function quickSearch(term) {
